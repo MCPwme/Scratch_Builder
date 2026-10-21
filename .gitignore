@@ -1,0 +1,33 @@
+# Byte-compiled / caches
+tests/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+
+# Virtual env
+venv/
+.venv/
+env/
+ENV/
+
+# PyCharm
+.idea/
+
+# VSCode
+.vscode/*
+
+# Distribution
+*.egg-info/
+
+# Logs
+*.log
+**/logs
+
+# OS
+.DS_Store
+Thumbs.db

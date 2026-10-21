@@ -1,0 +1,44 @@
+[build-system]
+requires = [
+    "colorlog>=6.7.0",
+    "wheel==0.48.0",
+    "setuptools==84.0.0"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scratch_builder"
+version = "1.0.0.dev20261021"
+description = "用 Python 代码生成 Scratch 3.0 项目文件(.sb3)"
+readme = "README.md"
+requires-python = ">=3.7"
+license = {text = "MIT"}
+authors = [
+    {name = "MCPwme", email = "wme9522@outlook.com"}
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Education",
+]
+keywords = ["scratch", "scratch3", "education", "code-generation"]
+
+[project.urls]
+Homepage = "https://github.com/MCPwme/Scratch_Builder"
+Repository = "https://github.com/MCPwme/Scratch_Builder"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+scratch_builder = ["*.svg", "*.py"]
