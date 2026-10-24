@@ -11,7 +11,7 @@ from pathlib import Path
 from .output import *
 from .blocks import Block, BlockBuilder
 
-initialize_output_system(False)
+initialize_output_system()
 
 class AssetManager:
     """素材管理器 - 负责计算MD5并管理素材"""

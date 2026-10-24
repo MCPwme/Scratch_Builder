@@ -7,7 +7,7 @@ import os
 import colorlog
 from datetime import datetime
 
-def initialize_output_system(output_init=True):
+def initialize_output_system():
     """
     Initializes the output system for logging messages to both console and file.
     """
@@ -75,9 +75,6 @@ def initialize_output_system(output_init=True):
     )
     console_handler.setFormatter(color_formatter)
     root_logger.addHandler(console_handler)
-    
-    if output_init:
-        logging.info('The Output System is running now.')
 
 def log_message(level, message):
     if level == 'info':
@@ -92,13 +89,3 @@ def log_message(level, message):
         logging.critical(message)
     else:
         logging.error(f'Unknown log level: {level}. Message: {message}')
-
-def test_logging():
-    log_message('info', '----------------------- Test Sample -----------------------')
-    log_message('info', 'This is an info message for testing purposes.')
-    log_message('error', 'This is an error message for testing purposes.')
-    log_message('warning', 'This is a warning message for testing purposes.')
-    log_message('debug', 'This is a debug message for testing purposes.')
-    log_message('critical', 'This is a critical message for testing purposes.')
-    log_message('info', '-----------------------------------------------------------')
-initialize_output_system(False)

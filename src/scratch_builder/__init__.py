@@ -9,9 +9,9 @@ from .sprite import Sprite
 from .project import ScratchProject
 
 # 初始化输出系统
-initialize_output_system(False)
+initialize_output_system()
 
-__version__ = "1.0.0.dev20261018"
+__version__ = "1.0.0.dev20261024"
 
 __all__ = [
     "ScratchProject",

@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "scratch_builder"
-version = "1.0.0.dev20261021"
+version = "1.0.0.dev20261024"
 description = "用 Python 代码生成 Scratch 3.0 项目文件(.sb3)"
 readme = "README.md"
 requires-python = ">=3.7"

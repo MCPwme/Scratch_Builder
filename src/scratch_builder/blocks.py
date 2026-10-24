@@ -33,19 +33,21 @@ class BlockBuilder:
     @staticmethod
     def _literal(value, value_type=4):
         if isinstance(value, (BlockBuilder, Block)):
-            return [1, value]
+            default_values = {4: "0", 9: "#000000"}
+            default_value = default_values.get(value_type, "")
+            return [3, [value_type, default_value], value]
         return [1, [value_type, str(value)]]
 
     def _prepare_inputs(self, block, inputs):
         prepared = {}
         for name, value in (inputs or {}).items():
-            if (isinstance(value, (list, tuple)) and len(value) == 2
-                    and isinstance(value[1], (BlockBuilder, Block))):
-                child_value = value[1]
+            if (isinstance(value, (list, tuple)) and len(value) in (2, 3)
+                    and isinstance(value[-1], (BlockBuilder, Block))):
+                child_value = value[-1]
                 child = child_value.current_block if isinstance(child_value, BlockBuilder) else child_value
                 child.parent_block = block
                 child.shadow = False
-                prepared[name] = [value[0], child.block_id]
+                prepared[name] = list(value[:-1]) + [child.block_id]
                 continue
             if isinstance(value, BlockBuilder):
                 child = value.current_block
@@ -59,6 +61,16 @@ class BlockBuilder:
             else:
                 prepared[name] = value
         return prepared
+
+    def _boolean_input(self, value):
+        if isinstance(value, (BlockBuilder, Block)):
+            return [2, value]
+        if isinstance(value, bool):
+            if not value:
+                return [1, [10, ""]]
+            return [2, self._create_reporter_block(
+                "operator_not", inputs={"OPERAND": [1, [10, ""]]})]
+        raise TypeError("Boolean inputs must be bools or Boolean reporter blocks")
 
     def _set_menu_input(self, block, input_name, menu_opcode, field_name, value):
         menu = Block(menu_opcode, fields={field_name: [str(value), None]})
@@ -127,13 +139,13 @@ class BlockBuilder:
                 "Y": self._literal(y)
             })
 
-    def go_to(self, target="random position"):
+    def go_to(self, target="_random_"):
         self._add_block("motion_goto")
         self._set_menu_input(
             self.current_block, "TO", "motion_goto_menu", "TO", target)
         return self
 
-    def glide_to(self, target="random position", seconds=1):
+    def glide_to(self, target="_random_", seconds=1):
         self._add_block("motion_glideto",
             inputs={"SECS": self._literal(seconds)})
         self._set_menu_input(
@@ -168,14 +180,14 @@ class BlockBuilder:
         return self._add_block("motion_pointindirection",
             inputs={"DIRECTION": self._literal(direction)})
     
-    def point_towards(self, target="mouse-pointer"):
+    def point_towards(self, target="_mouse_"):
         self._add_block("motion_pointtowards")
         self._set_menu_input(
             self.current_block, "TOWARDS", "motion_pointtowards_menu", "TOWARDS", target)
         return self
     
     def goto_random_position(self):
-        return self.go_to("random position")
+        return self.go_to("_random_")
     
     def if_on_edge_bounce(self):
         return self._add_block("motion_ifonedgebounce")
@@ -265,22 +277,22 @@ class BlockBuilder:
         """a 且 b - 返回报告器积木"""
         return self._create_reporter_block("operator_and",
             inputs={
-                "OPERAND1": self._literal(a),
-                "OPERAND2": self._literal(b)
+                "OPERAND1": self._boolean_input(a),
+                "OPERAND2": self._boolean_input(b)
             })
     
     def or_op(self, a, b):
         """a 或 b - 返回报告器积木"""
         return self._create_reporter_block("operator_or",
             inputs={
-                "OPERAND1": self._literal(a),
-                "OPERAND2": self._literal(b)
+                "OPERAND1": self._boolean_input(a),
+                "OPERAND2": self._boolean_input(b)
             })
     
     def not_op(self, a):
         """非 a - 返回报告器积木"""
         return self._create_reporter_block("operator_not",
-            inputs={"OPERAND": self._literal(a)})
+            inputs={"OPERAND": self._boolean_input(a)})
     
     def join(self, str1, str2):
         """连接字符串 - 返回报告器积木"""
@@ -594,7 +606,7 @@ class BlockBuilder:
     def if_then(self, condition, callback):
         self._validate_callbacks(callback)
         block = Block("control_if",
-            inputs={"CONDITION": [2, condition]})
+            inputs={"CONDITION": self._boolean_input(condition)})
         block.inputs = self._prepare_inputs(block, block.inputs)
         self.current_block.set_next(block)
         self.sprite._register_block(block)
@@ -605,7 +617,7 @@ class BlockBuilder:
     def if_else(self, condition, then_callback, else_callback):
         self._validate_callbacks(then_callback, else_callback)
         block = Block("control_if_else",
-            inputs={"CONDITION": [2, condition]})
+            inputs={"CONDITION": self._boolean_input(condition)})
         block.inputs = self._prepare_inputs(block, block.inputs)
         self.current_block.set_next(block)
         self.sprite._register_block(block)
@@ -616,12 +628,12 @@ class BlockBuilder:
 
     def wait_until(self, condition):
         return self._add_block("control_wait_until",
-            inputs={"CONDITION": [2, condition]})
+            inputs={"CONDITION": self._boolean_input(condition)})
 
     def repeat_until(self, condition, callback):
         self._validate_callbacks(callback)
         block = Block("control_repeat_until",
-            inputs={"CONDITION": [2, condition]})
+            inputs={"CONDITION": self._boolean_input(condition)})
         block.inputs = self._prepare_inputs(block, block.inputs)
         self.current_block.set_next(block)
         self.sprite._register_block(block)
@@ -726,13 +738,13 @@ class BlockBuilder:
     # ===== 其余侦测积木 =====
     def touching_color(self, color):
         return self._create_reporter_block("sensing_touchingcolor",
-            inputs={"COLOR": [1, [9, str(color)]]})
+            inputs={"COLOR": self._literal(color, 9)})
 
     def color_touching_color(self, color1, color2):
         return self._create_reporter_block("sensing_coloristouchingcolor",
             inputs={
-                "COLOR": [1, [9, str(color1)]],
-                "COLOR2": [1, [9, str(color2)]]
+                "COLOR": self._literal(color1, 9),
+                "COLOR2": self._literal(color2, 9)
             })
 
     def loudness(self):

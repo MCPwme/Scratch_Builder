@@ -51,8 +51,8 @@ def build_project():
         .set_y(60)
         .change_x_by(-20)
         .change_y_by(-10)
-        .point_towards("mouse-pointer")
-        .goto_random_position()
+        .point_towards("_mouse_")
+        .go_to("_random_")
         .if_on_edge_bounce()
     )
 

@@ -2,7 +2,7 @@
 
 Scratch Builder 是一个 Python 库，可通过代码生成 Scratch 3.0 项目文件（`.sb3`）。
 
-- 当前版本：`1.0.0.dev20261021`
+- 当前版本：`1.0.0.dev20261024`
 - Python：`3.7` 或更高版本
 - GitHub：https://github.com/MCPwme/Scratch_Builder
 - PyPI：https://pypi.org/project/scratch-builder/
@@ -119,8 +119,8 @@ sprite.when_i_receive("完成").say("收到了")
 | `turn_right(degrees=15)` | 向右转 | `degrees`：角度 |
 | `turn_left(degrees=15)` | 向左转 | `degrees`：角度 |
 | `go_to_xy(x=0, y=0)` | 移到坐标 | `x`, `y`：坐标 |
-| `go_to(target="random position")` | 移到角色、鼠标或随机位置 | `target`：目标 |
-| `glide_to(target="random position", seconds=1)` | 滑行到目标 | `target`：目标；`seconds`：秒数 |
+| `go_to(target="_random_")` | 移到角色、鼠标或随机位置 | `target`：目标 |
+| `glide_to(target="_random_", seconds=1)` | 滑行到目标 | `target`：目标；`seconds`：秒数 |
 | `glide_to_xy(x, y, seconds=1)` | 滑行到坐标 | `x`, `y`：坐标；`seconds`：秒数 |
 | `set_x(x)` | 设置 X 坐标 | `x`：坐标 |
 | `set_y(y)` | 设置 Y 坐标 | `y`：坐标 |
@@ -168,17 +168,24 @@ script = sprite.when_flag_clicked()
 condition = script.greater_than(script.variable("分数"), 0)
 (
     script
+    .move_steps(script.pick_random(2, 1))
     .repeat(3, lambda loop: loop.change_variable_by("分数", 1).move_steps(10))
     .if_then(condition, lambda branch: branch.say("分数大于零"))
     .broadcast("完成")
 )
 ```
 
+数值、文本及颜色值输入都可以嵌入报告器，例如
+`script.move_steps(script.pick_random(2, 1))` 或
+`script.touching_color(script.variable("颜色"))`；布尔报告器可以嵌套在逻辑运算或条件中，
+例如 `script.if_then(script.and_op(script.key_pressed("space"), condition), lambda branch: branch.say("成立"))`。
+
 `repeat(times, callback)`、`forever(callback)`、`if_then(condition, callback)`、
 `if_else(condition, then_callback, else_callback)` 和
 `repeat_until(condition, callback)` 的回调参数是该子脚本的构建器。`if_then`、
 `if_else`、`wait_until` 和 `repeat_until` 的条件接受报告器，例如
-`script.key_pressed("space")`、`script.greater_than(a, b)`。
+`script.key_pressed("space")`、`script.greater_than(a, b)`，也接受 Python 的
+`True` 和 `False`。
 
 角色变量与列表操作方法包括 `set_variable`、`change_variable_by`、`variable`、
 `add_item_to_list`、`delete_of_list`、`delete_all_of_list`、`insert_at_list`、

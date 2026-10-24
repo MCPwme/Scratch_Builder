@@ -13,7 +13,7 @@ import sys
 import os
 from pathlib import Path
 
-VERSION = "1.0.0.dev20261021"
+VERSION = "1.0.0.dev20261024"
 PROGRAM_NAME = "Scratch Builder"
 
 ANSI_COLORS = {
@@ -24,7 +24,7 @@ ANSI_COLORS = {
     'reset': '\033[0m'
 }
 
-initialize_output_system(False)
+initialize_output_system()
 
 
 def validate_sb3(file_path):
